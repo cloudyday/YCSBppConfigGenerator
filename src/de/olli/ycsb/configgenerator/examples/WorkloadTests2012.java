@@ -9,8 +9,8 @@ public class WorkloadTests2012 {
 	
 	public static void main(String[] args) {
 		
-		int baseWorkloadOps = Integer.parseInt(args[0]);
-		int baseWorkloadTarget = Integer.parseInt(args[1]);
+		int peakWorkloadOps = Integer.parseInt(args[0]);
+		int peakWorkloadThreads = Integer.parseInt(args[1]);
 		int scenario = Integer.parseInt(args[2]);
 		double writeRatio = Double.parseDouble(args[3]);
 		
@@ -51,9 +51,9 @@ public class WorkloadTests2012 {
 				return;
 		}
 		
-//		int peakWorkloadOps = (int) (baseWorkloadOps * peakWorkloadFactor);
-//		int peakWorkloadTarget = (int) (baseWorkloadTarget * peakWorkloadFactor);
-		int phasesToPeak = (int) (Math.ceil(peakWorkloadFactor / increaseToPeak));
+		int baseWorkloadOps = (int) (peakWorkloadOps / peakWorkloadFactor);
+		int baseWorkloadThreads = (int) (peakWorkloadThreads / peakWorkloadFactor);
+		int phasesToPeak = (int) (Math.floor(peakWorkloadFactor / increaseToPeak));
 		
 		Config c = new Config("Hotspot workload - scenario: "+scenarioName);
 		
@@ -88,15 +88,16 @@ public class WorkloadTests2012 {
 		c.setPhaseIndependent(p);
 		
 		
+		
 		for(int i=1;i<=phasesToPeak;i++) {
-			int opsCount = i * (int) (increaseToPeak * baseWorkloadOps);
-			int targetCount = i * (int) (increaseToPeak * baseWorkloadTarget);
+			int opsCount = baseWorkloadOps + (i-1) * (int) (increaseToPeak * baseWorkloadOps);
+			int targetCount = baseWorkloadThreads + (i-1) * (int) (increaseToPeak * baseWorkloadThreads);
 			
 			p = new Phase(i);
 			p.setOperationcount(opsCount+"");
 			p.setTarget(targetCount+"");
 			if(i==phasesToPeak) {
-				p.setOperationcount(opsCount*5+"");
+				p.setOperationcount(opsCount*2+"");
 			}
 			c.addPhase(p);
 		}
