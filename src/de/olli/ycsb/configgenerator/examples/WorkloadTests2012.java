@@ -91,14 +91,12 @@ public class WorkloadTests2012 {
 		
 		for(int i=1;i<=phasesToPeak;i++) {
 			int opsCount = baseWorkloadOps + (i-1) * (int) (increaseToPeak * baseWorkloadOps);
-			int targetCount = baseWorkloadThreads + (i-1) * (int) (increaseToPeak * baseWorkloadThreads);
+			int threadCount = baseWorkloadThreads + (i-1) * (int) (increaseToPeak * baseWorkloadThreads);
 			
 			p = new Phase(i);
 			p.setOperationcount(opsCount+"");
-			p.setTarget(targetCount+"");
-			if(i==phasesToPeak) {
-				p.setOperationcount(opsCount*2+"");
-			}
+			p.setThreadcount(threadCount+"");
+
 			c.addPhase(p);
 		}
 		
