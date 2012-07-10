@@ -27,6 +27,7 @@ public class WorkloadTests2012 {
 		double alpha;
 		double peakWorkloadFactor;
 		double increaseToPeak;
+		final int coolDownPhases = 5;
 		
 		
 		switch(scenario) {
@@ -36,7 +37,7 @@ public class WorkloadTests2012 {
 				alpha = 0d;
 				variance = 0d;
 				peakWorkloadFactor = 2.43;
-				increaseToPeak = 25.4/100;
+				increaseToPeak = 25.4;
 				break;
 			case 2:
 				scenarioName = "WorldCup";
@@ -44,7 +45,7 @@ public class WorkloadTests2012 {
 				alpha = 0.8;
 				variance = 0.0005;
 				peakWorkloadFactor = 4.97;
-				increaseToPeak = 8.7/100;
+				increaseToPeak = 8.7;
 				break;
 			default:
 				System.err.println("wrong scenario number");
@@ -53,7 +54,7 @@ public class WorkloadTests2012 {
 		
 		int baseWorkloadOps = (int) (peakWorkloadOps / peakWorkloadFactor);
 		int baseWorkloadThreads = (int) (peakWorkloadThreads / peakWorkloadFactor);
-		int phasesToPeak = (int) (Math.floor(peakWorkloadFactor / increaseToPeak));
+		int phasesToPeak = (int) (100/increaseToPeak/2);
 		
 		Config c = new Config("Hotspot workload - scenario: "+scenarioName);
 		
@@ -89,16 +90,28 @@ public class WorkloadTests2012 {
 		
 		
 		
-		for(int i=1;i<=phasesToPeak;i++) {
-			int opsCount = baseWorkloadOps + (i-1) * (int) (increaseToPeak * baseWorkloadOps);
-			int threadCount = baseWorkloadThreads + (i-1) * (int) (increaseToPeak * baseWorkloadThreads);
+		for(int i=0;i<=phasesToPeak;i++) {
+			int opsCount = baseWorkloadOps + i * (int) ((peakWorkloadOps-baseWorkloadOps) / phasesToPeak);
+			int threadCount = baseWorkloadThreads + i * (int) ((peakWorkloadThreads-baseWorkloadThreads) / phasesToPeak);
 			
-			p = new Phase(i);
+			p = new Phase(i+1);
 			p.setOperationcount(opsCount+"");
 			p.setThreadcount(threadCount+"");
 
 			c.addPhase(p);
 		}
+		
+		for(int i=1;i<=coolDownPhases;i++) {
+			int opsCount = peakWorkloadOps - i * (peakWorkloadOps-baseWorkloadOps)/coolDownPhases;
+			int threadCount = peakWorkloadThreads - i * (peakWorkloadThreads-baseWorkloadThreads)/coolDownPhases;
+			
+			p = new Phase(i+phasesToPeak+1);
+			p.setOperationcount(opsCount+"");
+			p.setThreadcount(threadCount+"");
+
+			c.addPhase(p);
+		}
+		
 		
 		System.out.println(c.toConfigString());
 		 
